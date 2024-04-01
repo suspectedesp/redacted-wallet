@@ -1,0 +1,20 @@
+{
+  "name": "redacted-wallet",
+  "version": "1.0.0",
+  "description": "Wallet Provider",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "wallet",
+    "provider",
+    "crypto"
+  ],
+  "author": "[redacted]",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "open": "^10.1.0"
+  }
+}
