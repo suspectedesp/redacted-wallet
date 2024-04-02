@@ -14,8 +14,10 @@ Open-Source selfmade crypto wallet
 3. Install dependencies: `npm install`
 
 ## Usage
-1. Start the server: `node server.js` or via `start.bat`
-2. You can now check your wallet balance and conversion rates.
+1. Set all variables in `.env.example`
+2. Rename `.env.example` to `.env`
+3. Start the server: `node server.js` or via `start.bat`
+4. You can now check your wallet balance and conversion rates.
 
 ## Dependencies
 - axios: ^1.6.8,
