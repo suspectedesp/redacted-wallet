@@ -1,5 +1,5 @@
-const port = 1337;
-var endpointUrl = `http://localhost:${port}/api/walletBalance`;
+var port = 1337;
+var endpointUrl = "http://localhost:".concat(port, "/api/walletBalance");
 function triggerNodeFunction() {
     fetch(endpointUrl)
         .then(function (response) {

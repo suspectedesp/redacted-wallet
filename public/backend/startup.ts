@@ -1,4 +1,5 @@
-const endpointUrl = 'http://localhost:3000/api/walletBalance';
+const port = 1337
+const endpointUrl = `http://localhost:${port}/api/walletBalance`;
 
 function triggerNodeFunction() {
     fetch(endpointUrl)
