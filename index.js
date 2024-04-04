@@ -35,7 +35,7 @@ app.get('/api/walletBalance', (req, res) => {
           const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,litecoin&vs_currencies=eur');
           return response.data;
         } catch (error) {
-          throw new Error('Failed to fetch conversion rates');
+          throw new Error(`Failed to fetch conversion rates: ${error}`);
         }
       }
       
