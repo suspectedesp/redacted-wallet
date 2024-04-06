@@ -81,23 +81,43 @@ app.get('/api/walletBalance', (req, res) => {
       }
 });
 
-const server = app.listen(port, () => {
+app.listen(port, () => { // server start
     console.log(`[INFO] | [redacted] Wallet server has been successfully launched at http://localhost:${port}`);
     openBrowser(`http://localhost:${port}`);
     createWallet();
 });
 
-function isConfigJsonEmpty(callback) {
-    const configFilePath = path.join(__dirname, 'config.json');
+function isConfigJsonEmpty() {
+    return new Promise((resolve, reject) => {
+        const configFilePath = path.join(__dirname, 'config.json');
+        fs.readFile(configFilePath, 'utf8', (err, data) => {
+            if (err) {
+                if (err.code === 'ENOENT') { // File not found
+                    resolve(true);
+                } else {
+                    console.error('Error reading config.json:', err);
+                    reject(err);
+                }
+            } else {
+                const isEmpty = data.trim() === '{}' || data.trim() === '';
+                resolve(isEmpty);
+            }
+        });
+    });
+}
 
-    fs.readFile(configFilePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error reading config.json:', err);
-            callback(false);
-            return;
-        }
-        const isEmpty = data.trim() === '{}' || data.trim() === '';
-        callback(isEmpty);
+function writeConfigJson(configData) {
+    return new Promise((resolve, reject) => {
+        const configFilePath = path.join(__dirname, 'config.json');
+        fs.writeFile(configFilePath, configData, 'utf8', (err) => {
+            if (err) {
+                console.error('Error writing config.json:', err);
+                reject(err);
+            } else {
+                console.log('config.json has been successfully created.');
+                resolve();
+            }
+        });
     });
 }
 
@@ -108,24 +128,33 @@ function openBrowser(url) {
 
 async function createWallet() {
     try {
-        isConfigJsonEmpty(async (isEmpty) => {
-            if (isEmpty) {
-                console.log("No wallet has been set");
-                const walletResponse = await axios.post(`https://api.blockcypher.com/v1/ltc/main/wallets?token=${token}`, JSON.stringify(data));
-                const walletData = walletResponse.data;
-                console.log("Wallet created successfully:");
-                console.log("Name:", walletData.name);
-                console.log("Token:", walletData.token);
-                console.log("Addresses:", walletData.addresses);
-                const addressResponse = await axios.post(`https://api.blockcypher.com/v1/ltc/main/wallets/${walletData.name}/addresses/generate?token=${token}`);
-                const addressData = addressResponse.data;
-                const configFilePath = path.join(__dirname, 'config.json');
-                fs.writeFileSync(configFilePath, JSON.stringify({ wallet: walletData, address: addressData }, null, 2));
+        const isEmpty = await isConfigJsonEmpty();
+        if (isEmpty) {
+            console.log("No wallet has been set");
+            const walletResponse = await axios.post(`https://api.blockcypher.com/v1/ltc/main/wallets?token=${token}`, JSON.stringify(data));
+            const walletData = walletResponse.data;
+            console.log("Wallet created successfully:");
+            console.log("Name:", walletData.name);
+            console.log("Token:", walletData.token);
+            console.log("Addresses:", walletData.addresses);
+            const addressResponse = await axios.post(`https://api.blockcypher.com/v1/ltc/main/wallets/${walletData.name}/addresses/generate?token=${token}`);
+            const addressData = addressResponse.data;
+            
+            // Constructing the desired structure
+            const configData = {
+                token: token,
+                name: walletData.name,
+                addresses: addressData.addresses,
+                private: addressData.private,
+                public: addressData.public,
+                address: addressData.address,
+                wif: addressData.wif
+            };
 
-            } else {
-                console.log("Already existing wallet has been found");
-            }
-        });
+            await writeConfigJson(JSON.stringify(configData, null, 2));
+        } else {
+            console.log("Already existing wallet has been found");
+        }
     } catch (error) {
         console.error('Error creating wallet:', error);
     }
