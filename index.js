@@ -61,9 +61,9 @@ app.get('/api/walletBalance', (req, res) => {
           const euros = bitcoins * btcToEurRate;
           const litecoins = bitcoins * btcToLtcRate;
       
-          console.log("Final Balance (in satoshis):", satoshis);
+          /* console.log("Final Balance (in satoshis):", satoshis);
           console.log("Final Balance (in euros):", euros);
-          console.log("Final Balance (in litecoins):", litecoins);
+          console.log("Final Balance (in litecoins):", litecoins); */
           const responseData = {
             "Amount in Satoshis:": satoshis,
             "Amount in Bitcoins: ": bitcoins,
@@ -82,7 +82,7 @@ app.get('/api/walletBalance', (req, res) => {
 });
 
 const server = app.listen(port, () => {
-    console.log(`[redacted] Wallet server has been successfully launched at http://localhost:${port}`);
+    console.log(`[INFO] | [redacted] Wallet server has been successfully launched at http://localhost:${port}`);
     openBrowser(`http://localhost:${port}`);
     createWallet();
 });

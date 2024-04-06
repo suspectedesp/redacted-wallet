@@ -1,8 +1,8 @@
-const port = 1337
-const endpointUrl = `http://localhost:${port}/api/walletBalance`;
+const port = 1337;
+const walletBalance = `http://localhost:${port}/api/walletBalance`;
 
 function triggerNodeFunction() {
-    fetch(endpointUrl)
+    fetch(walletBalance)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to trigger Node.js function');
