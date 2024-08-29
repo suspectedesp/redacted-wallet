@@ -1,17 +1,17 @@
-var port = 1337;
-var endpointUrl = "http://localhost:".concat(port, "/api/walletBalance");
+const port = 1337;
+const walletBalance = `http://localhost:${port}/api/walletBalance`;
 function triggerNodeFunction() {
-    fetch(endpointUrl)
-        .then(function (response) {
+    fetch(walletBalance)
+        .then(response => {
         if (!response.ok) {
             throw new Error('Failed to trigger Node.js function');
         }
         return response.text();
     })
-        .then(function (data) {
+        .then(data => {
         console.log(data);
     })
-        .catch(function (error) {
+        .catch(error => {
         console.error('Error:', error);
     });
 }

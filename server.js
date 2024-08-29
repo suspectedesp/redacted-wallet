@@ -6,6 +6,9 @@ require('dotenv').config();
 const axios = require('axios');
 const app = express();
 const port = 1337;
+const { exec } = require('child_process');
+const os = require('os');
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 const configFilePath = path.join(__dirname, 'config.json');
@@ -15,7 +18,7 @@ const wallet = process.env.wallet_name;
 const data = {
     name: wallet,
     address: addy
-};
+};  
 
 app.get('/', (req, res) => {
     if (fs.existsSync(configFilePath)) {
@@ -32,12 +35,25 @@ app.get('/', (req, res) => {
 app.get('/api/walletBalance', (req, res) => {
     async function fetchConversionRates() {
         try {
-          const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,litecoin&vs_currencies=eur');
-          return response.data;
-        } catch (error) {
-          throw new Error(`Failed to fetch conversion rates: ${error}`);
+            const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,litecoin&vs_currencies=eur');
+            return response.data;
+          } catch (error) {
+            if (error.response) {
+              const statusCode = error.response.status;
+        
+              if (statusCode === 429) {
+                console.error('Failed to fetch conversion rates. Too Many Requests: Rate limit exceeded.');
+              } else {
+                console.error(`HTTP Error: ${statusCode}`);
+              }
+              
+              throw new Error(`Failed to fetch conversion rates. Status code: ${statusCode}`);
+            } else {
+              console.error('Error:', error.message);
+              throw new Error(`Failed to fetch conversion rates due to ${error.message}.`);
+            }
+          }
         }
-      }
       
       const configFilePath = path.join(__dirname, './config.json');
       try {
@@ -136,10 +152,12 @@ async function createWallet() {
             console.log("Wallet created successfully:");
             console.log("Name:", walletData.name);
             console.log("Token:", walletData.token);
-            console.log("Addresses:", walletData.addresses);
             const addressResponse = await axios.post(`https://api.blockcypher.com/v1/ltc/main/wallets/${walletData.name}/addresses/generate?token=${token}`);
             const addressData = addressResponse.data;
-            
+
+            //if it doesn't work: console.log("Addresses:", walletData.addresses);
+            console.log("Addresses:", addressData.addresses);
+
             // Constructing the desired structure
             const configData = {
                 token: token,
